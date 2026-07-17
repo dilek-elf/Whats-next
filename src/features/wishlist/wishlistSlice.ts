@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 
-type WishlistItem = { id: number; title: string; done: boolean };
+export type WishlistItem = { id: number; title: string; done: boolean };
 
 const initialState: WishlistItem[] = [];
 

@@ -1,31 +1,19 @@
-import { createContext, useState, useContext, useEffect } from 'react';
+import { useState, useEffect, type ReactNode } from 'react';
+import { ThemeContext } from './theme';
 
-type ThemeContextType = {
-  theme: 'light' | 'dark';
-  toggleTheme: () => void;
-};
-
-const ThemeContext = createContext<ThemeContextType | null>(null);
-
-export function useTheme() {
-  const context = useContext(ThemeContext);
-  if (!context) throw new Error('useTheme must be used within ThemeProvider');
-  return context;
-}
-
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
+export function ThemeProvider({ children }: { children: ReactNode }) {
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    const savedTheme = localStorage.getItem('whats-next-theme');
+    if (savedTheme === 'light' || savedTheme === 'dark') return savedTheme;
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  });
   function toggleTheme() {
     setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
   }
 
   useEffect(() => {
-    try {
-      document.documentElement.setAttribute('data-theme', theme);
-      document.documentElement.classList.toggle('dark', theme === 'dark');
-    } catch (e) {
-      // server-side rendering guard
-    }
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('whats-next-theme', theme);
   }, [theme]);
 
   return (
